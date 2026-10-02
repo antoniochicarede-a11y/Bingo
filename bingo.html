@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bingo de los Abuelos</title>
+<style>
+:root{--bg:#fff4d6;--card:#ffffff;--ink:#3b1f0b;--accent:#d62839;--accent2:#1b7f3b;--gold:#ffb703;--off:#f1e3c0;--z:1;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2a1a3a;--card:#3d2755;--ink:#fff6e0;--off:#4d3470}}
+:root[data-tema="mar"]{--bg:#dff3ff;--card:#fff;--ink:#12324f;--accent:#0b5cad;--accent2:#00796b;--off:#cfe6f7}
+:root[data-tema="noche"]{--bg:#1d1b3a;--card:#2c2a55;--ink:#fff6e0;--accent:#ff4d6d;--accent2:#2ec27e;--off:#43407a}
+*{box-sizing:border-box}
+html{font-size:calc(16px*var(--z))}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Trebuchet MS",Verdana,Arial,sans-serif;text-align:center;overflow-x:hidden}
+h1{font-size:clamp(2rem,6vw,3.4rem);margin:.4em .2em .1em;color:var(--accent)}
+.sub{font-size:1.3rem;margin:0 0 .6em}
+main{max-width:1100px;margin:0 auto;padding:0 12px 30px}
+.stage{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:center;background:var(--card);border-radius:28px;padding:16px;border:5px solid var(--gold)}
+.ball{width:min(62vw,300px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 30% 25%,#fff 0 12%,var(--accent) 13% 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:clamp(5rem,22vw,10rem);font-weight:900;box-shadow:0 12px 0 rgba(0,0,0,.2);text-shadow:3px 3px 0 rgba(0,0,0,.3)}
+.ball.pop{animation:pop .9s cubic-bezier(.2,1.6,.4,1)}
+.ball.roll{animation:wob .12s infinite}
+@keyframes pop{0%{transform:scale(.1) rotate(-360deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes wob{0%{transform:rotate(-6deg) scale(.95)}50%{transform:rotate(6deg) scale(1.03)}100%{transform:rotate(-6deg) scale(.95)}}
+.say{flex:1 1 280px;min-width:260px}
+#frase{font-size:clamp(1.8rem,5vw,2.8rem);font-weight:800;min-height:2.6em;color:var(--accent2);margin:0 0 10px}
+#count{font-size:1.4rem}
+.btns{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:16px 0}
+button{font:inherit;font-weight:800;border:0;border-radius:22px;padding:14px 22px;font-size:1.3rem;cursor:pointer;color:#fff;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+button:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+button:focus-visible{outline:5px solid var(--gold)}
+#sacar{background:var(--accent2);font-size:clamp(2rem,7vw,3.2rem);padding:22px 40px;animation:latido 1.6s infinite}
+#sacar:disabled{animation:none;opacity:.6}
+@keyframes latido{50%{transform:scale(1.05)}}
+.sec{background:#2a6fdb}.nue{background:#8a3ffc}.lin{background:#e87d00;font-size:1.8rem}.bin{background:#d62839;font-size:1.8rem}
+h2{font-size:1.7rem;margin:.6em 0 .3em}
+#ultimas{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;min-height:70px}
+.mini{width:68px;height:68px;border-radius:50%;background:var(--gold);color:#3b1f0b;font-size:2rem;font-weight:900;display:flex;align-items:center;justify-content:center;border:3px solid #3b1f0b}
+#tabla{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;max-width:900px;margin:0 auto}
+.n{background:var(--off);border-radius:10px;padding:6px 0;font-size:clamp(1rem,3.4vw,1.8rem);font-weight:800;color:var(--ink);opacity:.55}
+.n.on{background:var(--accent);color:#fff;opacity:1;border:3px solid var(--gold)}
+.n.now{animation:latido .6s 3}
+#cartones{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+.carton{background:var(--card);border:5px solid var(--accent2);border-radius:18px;padding:10px;width:min(100%,520px)}
+.carton h3{margin:0 0 6px;font-size:1.5rem;cursor:pointer}
+.cg{display:grid;grid-template-columns:repeat(9,1fr);gap:4px}
+.c{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:clamp(1rem,3.6vw,1.9rem);font-weight:900;background:var(--off);color:var(--ink)}
+.c.v{background:transparent;border:2px dashed var(--off)}
+.c.on{background:var(--accent);color:#fff;border:3px solid var(--gold);transform:scale(1.05)}
+.conf{position:fixed;top:-60px;font-size:2.2rem;pointer-events:none;z-index:9;animation:cae linear forwards}
+@keyframes cae{to{transform:translateY(115vh) rotate(540deg)}}
+#banner{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;background:rgba(0,0,0,.65);z-index:20;color:#fff;font-size:clamp(3rem,16vw,9rem);font-weight:900;text-shadow:4px 4px 0 var(--accent)}
+#banner small{font-size:clamp(1.4rem,5vw,2.6rem);text-shadow:none}
+#banner.show{display:flex;animation:pop .8s cubic-bezier(.2,1.6,.4,1)}
+</style>
+</head>
+<body>
+<main>
+  <h1>🎉 ¡Bingo de los Abuelos! 🎉</h1>
+  <p class="sub">Pulsa el botón verde (o la barra espaciadora) para sacar una bola</p>
+
+  <section class="stage">
+    <div class="ball" id="bola">?</div>
+    <div class="say">
+      <p id="frase">¡Vamos a jugar!</p>
+      <div id="count">Bolas sacadas: 0 de 90</div>
+    </div>
+  </section>
+
+  <div class="btns">
+    <button id="sacar">🎱 ¡SACAR BOLA!</button>
+  </div>
+  <div class="btns">
+    <button class="lin" id="linea">🎯 ¡LÍNEA!</button>
+    <button class="bin" id="bingo">🏆 ¡BINGO!</button>
+  </div>
+  <div class="btns">
+    <button class="sec" id="repetir">🔊 Repetir</button>
+    <button class="sec" id="sonido">🔔 Sonido: SÍ</button>
+    <button class="sec" id="voz">🗣️ Cambiar voz</button>
+    <button class="nue" id="nueva">🔄 Nueva partida</button>
+  </div>
+
+  <h2>Las últimas bolas</h2>
+  <div id="ultimas"></div>
+
+  <h2>Mis cartones</h2>
+  <div class="btns">
+    <button class="sec" id="menos">➖ Cartón</button>
+    <button class="sec" id="mas">➕ Cartón</button>
+  </div>
+  <div id="cartones"></div>
+
+  <h2>Todos los números</h2>
+  <div id="tabla"></div>
+
+  <h2>Ajustes</h2>
+  <div class="btns">
+    <button class="nue" id="amenos">A− Letra pequeña</button>
+    <button class="nue" id="amas">A+ Letra grande</button>
+    <button class="nue" id="tema">🎨 Cambiar colores</button>
+  </div>
+</main>
+<div id="banner"></div>
+
+<script>
+const frases={1:"el solitario",11:"las piernas de la abuela",15:"la niña bonita",22:"los dos patitos",33:"la edad de Cristo",44:"las cuatro esquinas",55:"las cinco ranas",77:"las banderillas",88:"las dos gordas",90:"el abuelo"};
+const genericas=["¡Olé!","¡Qué bien!","¡Vamos allá!","¡Mirad qué bonito!","¡Aquí viene!","¡Chispa!","¡Ay, qué nervios!","¡Fenomenal!","¡Esa es buena!","¡Atentos, abuelos!"];
+const emojis=["🎉","🎊","⭐","🌟","🎈","💃","🕺","🍀","🌹","🥳"];
+const temas=["","mar","noche"];
+let pool,sacadas,sonido=true,ocupado=false,ultimoTexto="",cartones=[],nCart=2,lineaOk,bingoOk,zoom=1,tIdx=0,vozes=[],vIdx=0;
+const $=id=>document.getElementById(id);
+let ac;
+function audio(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();}catch(e){}return ac}
+function tono(f,t,d,tipo="triangle",v=.25){const c=audio();if(!c||!sonido)return;const o=c.createOscillator(),g=c.createGain();o.type=tipo;o.frequency.value=f;g.gain.setValueAtTime(v,c.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+d);o.connect(g);g.connect(c.destination);o.start(c.currentTime+t);o.stop(c.currentTime+t+d+.05)}
+function rodar(){for(let i=0;i<14;i++)tono(300+Math.random()*500,i*.06,.08,"square",.08)}
+function fanfarria(){[523,659,784,1047].forEach((f,i)=>tono(f,i*.12,.3));tono(1319,.5,.6,"sine",.3)}
+function fiesta(){[523,659,784,1047,784,1047,1319,1568].forEach((f,i)=>tono(f,i*.11,.28,"triangle",.3));tono(2093,1,1,"sine",.3);for(let i=0;i<12;i++)tono(200+(i%2)*80,1.1+i*.07,.1,"square",.1)}
+function cargarVoces(){if(!window.speechSynthesis)return;const p=/(google|m[oó]nica|paulina|helena|elena|luc[ií]a|sabina|female|natural|online)/i;vozes=speechSynthesis.getVoices().filter(v=>v.lang.toLowerCase().startsWith("es")).sort((a,b)=>p.test(b.name)-p.test(a.name))}
+if(window.speechSynthesis){speechSynthesis.onvoiceschanged=cargarVoces;cargarVoces()}
+function hablar(txt){if(!sonido||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang="es-ES";if(vozes[vIdx])u.voice=vozes[vIdx];u.rate=1.05;u.pitch=1.45;u.volume=1;speechSynthesis.speak(u)}
+function confeti(n=28){for(let i=0;i<n;i++){const s=document.createElement("span");s.className="conf";s.textContent=emojis[Math.floor(Math.random()*emojis.length)];s.style.left=Math.random()*100+"vw";s.style.animationDuration=2+Math.random()*2.5+"s";document.body.appendChild(s);setTimeout(()=>s.remove(),5000)}}
+function celebrar(txt,quien,grande){const b=$("banner");b.innerHTML=txt+(quien?"<small>"+quien+"</small>":"");b.classList.remove("show");void b.offsetWidth;b.classList.add("show");fiesta();confeti(grande?90:50);setTimeout(()=>hablar(txt.replace(/[🎯🏆]/g,"")+" ¡"+txt.replace(/[¡!🎯🏆 ]/g,"")+"! ¡Felicidades"+(quien?", "+quien:"")+"!"),400);setTimeout(()=>b.classList.remove("show"),4500)}
+$("banner").onclick=()=>$("banner").classList.remove("show");
+function crearCarton(i){const filas=[[],[],[]];for(let f=0;f<3;f++){filas[f]=Array(9).fill(0)}
+  const cols=[...Array(9).keys()];
+  for(let f=0;f<3;f++){const el=[...cols].sort(()=>Math.random()-.5).slice(0,5);el.forEach(c=>filas[f][c]=1)}
+  for(let c=0;c<9;c++){const lo=c==0?1:c*10,hi=c==8?90:c*10+9;const k=filas.filter(r=>r[c]).length;const nums=[];while(nums.length<k){const x=lo+Math.floor(Math.random()*(hi-lo+1));if(!nums.includes(x))nums.push(x)}nums.sort((a,b)=>a-b);let j=0;for(let f=0;f<3;f++)if(filas[f][c])filas[f][c]=nums[j++]}
+  return{nombre:"Cartón "+(i+1),filas}}
+function pintarCartones(){$("cartones").innerHTML="";cartones.forEach((k,i)=>{const d=document.createElement("div");d.className="carton";const h=document.createElement("h3");h.textContent="🎴 "+k.nombre+" (toca para cambiar el nombre)";h.onclick=()=>{const n=prompt("Nombre del cartón:",k.nombre);if(n){k.nombre=n;pintarCartones()}};d.appendChild(h);const g=document.createElement("div");g.className="cg";k.filas.forEach(r=>r.forEach(n=>{const c=document.createElement("div");c.className="c"+(n?(sacadas.includes(n)?" on":""):" v");c.textContent=n||"";g.appendChild(c)}));d.appendChild(g);$("cartones").appendChild(d)})}
+function revisar(){for(const k of cartones){const ok=k.filas.filter(r=>r.every(n=>!n||sacadas.includes(n))).length;
+  if(ok===3&&!bingoOk){bingoOk=lineaOk=true;celebrar("🏆 ¡BINGO!",k.nombre,true);$("sacar").disabled=true;return}
+  if(ok>=1&&!lineaOk){lineaOk=true;celebrar("🎯 ¡LÍNEA!",k.nombre,false);return}}}
+function nueva(){pool=Array.from({length:90},(_,i)=>i+1);sacadas=[];lineaOk=bingoOk=false;$("bola").textContent="?";$("frase").textContent="¡Vamos a jugar!";$("count").textContent="Bolas sacadas: 0 de 90";$("ultimas").innerHTML="";$("sacar").disabled=false;ocupado=false;ultimoTexto="";
+  $("tabla").innerHTML="";for(let i=1;i<=90;i++){const d=document.createElement("div");d.className="n";d.id="n"+i;d.textContent=i;$("tabla").appendChild(d)}
+  cartones=Array.from({length:nCart},(_,i)=>crearCarton(i));pintarCartones()}
+function sacar(){
+  if(ocupado||!pool.length||bingoOk)return;ocupado=true;audio();
+  const b=$("bola");b.classList.remove("pop");b.classList.add("roll");rodar();$("frase").textContent="🥁 ¡Sale la bola...!";
+  const t=setInterval(()=>b.textContent=1+Math.floor(Math.random()*90),70);
+  setTimeout(()=>{
+    clearInterval(t);
+    const n=pool.splice(Math.floor(Math.random()*pool.length),1)[0];sacadas.push(n);
+    b.classList.remove("roll");b.textContent=n;void b.offsetWidth;b.classList.add("pop");
+    const e=emojis[Math.floor(Math.random()*emojis.length)];
+    const extra=frases[n]?"¡"+frases[n][0].toUpperCase()+frases[n].slice(1)+"!":genericas[Math.floor(Math.random()*genericas.length)];
+    $("frase").textContent=e+" "+extra+" "+e;
+    $("count").textContent="Bolas sacadas: "+sacadas.length+" de 90";
+    $("n"+n).classList.add("on","now");
+    $("ultimas").innerHTML=sacadas.slice(-5).reverse().map(x=>'<div class="mini">'+x+'</div>').join("");
+    fanfarria();confeti();pintarCartones();
+    ultimoTexto="¡Atención! ¡El "+n+"! "+(n>9?String(n).split("").join(", ")+". ":"")+extra.replace(/[¡]/g,"")+" ¡Olé!";
+    revisar();
+    if(!bingoOk)setTimeout(()=>hablar(ultimoTexto),500);
+    if(!pool.length){$("frase").textContent="🏁 ¡Se acabaron las bolas!";$("sacar").disabled=true}
+    ocupado=false;
+  },1100);
+}
+$("sacar").onclick=sacar;
+$("linea").onclick=()=>{audio();celebrar("🎯 ¡LÍNEA!","",false)};
+$("bingo").onclick=()=>{audio();celebrar("🏆 ¡BINGO!","",true)};
+$("repetir").onclick=()=>ultimoTexto&&hablar(ultimoTexto);
+$("sonido").onclick=()=>{sonido=!sonido;$("sonido").textContent=sonido?"🔔 Sonido: SÍ":"🔕 Sonido: NO";if(!sonido&&window.speechSynthesis)speechSynthesis.cancel()};
+$("voz").onclick=()=>{cargarVoces();if(vozes.length)vIdx=(vIdx+1)%vozes.length;hablar("¡Hola, abuelos! ¡Vamos a jugar al bingo, que hoy toca ganar!")};
+$("nueva").onclick=()=>{if(!sacadas.length||confirm("¿Empezar una partida nueva?"))nueva()};
+$("mas").onclick=()=>{if(nCart<4){nCart++;cartones.push(crearCarton(nCart-1));pintarCartones()}};
+$("menos").onclick=()=>{if(nCart>0){nCart--;cartones.pop();pintarCartones()}};
+$("amas").onclick=()=>{zoom=Math.min(1.5,zoom+.1);document.documentElement.style.setProperty("--z",zoom)};
+$("amenos").onclick=()=>{zoom=Math.max(.8,zoom-.1);document.documentElement.style.setProperty("--z",zoom)};
+$("tema").onclick=()=>{tIdx=(tIdx+1)%temas.length;temas[tIdx]?document.documentElement.setAttribute("data-tema",temas[tIdx]):document.documentElement.removeAttribute("data-tema")};
+document.addEventListener("keydown",e=>{if(e.code==="Space"&&e.target.tagName!=="BUTTON"){e.preventDefault();sacar()}});
+nueva();
+</script>
+</body>
+</html>
